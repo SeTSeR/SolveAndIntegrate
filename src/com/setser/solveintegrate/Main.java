@@ -20,11 +20,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.function.Function;
 
-/**
- * Created by hp on 08.08.2016.
- */
 public class Main extends Application {
 
     public static void main(String[] args) {
@@ -61,6 +60,8 @@ public class Main extends Application {
 
     private void draw(GraphicsContext graphicsContext, double xleft, double ytop, double width, double height,
                       Function<Double, Double> f, double a, double b) {
+        DecimalFormat decimalFormat = new DecimalFormat();
+        decimalFormat.setRoundingMode(RoundingMode.CEILING);
         int n = 1000;
         graphicsContext.translate(xleft, ytop);
         graphicsContext.clearRect(0, 0, width, height);
@@ -81,7 +82,7 @@ public class Main extends Application {
         double xa = 10;
         double ya = 10;
         double xcoef = width / (b - a);
-        double ycoef = 0;
+        double ycoef;
         double xshift = width * a / (a - b);
         double yshift = height * ymax / (ymax - ymin);
         if(Math.abs(ymax - ymin) < eps) {
@@ -118,16 +119,27 @@ public class Main extends Application {
             while(b - begin >= eps) {
                 graphicsContext.moveTo(xcoef * begin + xshift, ycoef * 0 + yshift + 5);
                 graphicsContext.lineTo(xcoef * begin + xshift, ycoef * 0 + yshift - 5);
-                graphicsContext.fillText(Double.toString(begin), xcoef * begin + xshift, ycoef * 0 + yshift + 10);
+                graphicsContext.fillText(decimalFormat.format(begin), xcoef * begin + xshift, ycoef * 0 + yshift + 10);
                 begin += step1;
             }
         }
-        for(int i = 0; i < n1; ++i) {
+        if(((step2 * 1000 - (int)(step2 * 1000)) <= eps1) || ((int)(step2 * 1000 + 1) - step2 * 1000) <= eps1) {
+            if((step2 * 1000 - (int)(step2 * 1000)) <= eps1) step2 = ((int)(step2 * 1000)) / 1000.0;
+            else step2 = ((int)(step2 * 1000 + 1)) / 1000.0;
+            double begin = (1000 * ymin - (int)(1000 * ymin) >= eps) ? ((int)(1000 * ymin + 1)) / 1000.0 : ymin;
+            while(ymax - begin >= eps) {
+                graphicsContext.moveTo(xcoef * 0 + xshift + 5, ycoef * begin + yshift);
+                graphicsContext.lineTo(xcoef * 0 + xshift - 5, ycoef * begin + yshift);
+                graphicsContext.fillText(decimalFormat.format(begin), xcoef * 0 + xshift + 10, ycoef * begin + yshift);
+                begin += step2;
+            }
+        }
+/*        for(int i = 0; i < n1; ++i) {
             graphicsContext.moveTo(xcoef * (a + i * step1) + xshift, ycoef * 0 + yshift + 5);
             graphicsContext.lineTo(xcoef * (a + i * step1) + xshift, ycoef * 0 + yshift - 5);
-            graphicsContext.fillText(Double.toString(a + i * step1), xcoef * (a + i * step1) + xshift, ycoef * 0 + yshift + 10);
+            graphicsContext.fillText(df.for(a + i * step1), xcoef * (a + i * step1) + xshift, ycoef * 0 + yshift + 10);
         }
-/*        for(int i = 0; i < n2; ++i) {
+        for(int i = 0; i < n2; ++i) {
             graphicsContext.moveTo(xcoef * 0 + xshift + 5, ycoef * (ymin + i * step2) + yshift);
             graphicsContext.lineTo(xcoef * 0 + xshift - 5, ycoef * (ymin + i * step2) + yshift);
             graphicsContext.fillText(Double.toString(ymin + i * step2), xcoef * 0 + xshift + 10, ycoef * (ymin + i * step2) + yshift);
@@ -143,8 +155,8 @@ public class Main extends Application {
         int width = 1200;
         int height = 500;
         Canvas canvas = new Canvas(width, height);
-        Function<Double, Double> f = (Double x) -> { return Math.sin(x); };
-        Function<Double, Double> df = (Double x) -> { return Math.cos(x); };
+        Function<Double, Double> f = (Double x) -> { return 3*Math.sin(x) + 2*Math.log(x); };
+        Function<Double, Double> df = (Double x) -> { return 3*Math.cos(x) + 2/x; };
         VBox vBoxab = new VBox();
         HBox hBoxa = new HBox();
         Label aLabel = new Label("a:");
