@@ -12,11 +12,6 @@ public class MathUtils {
         double sum1 = 0, sum2 = 0;
         double step = (b-a)/n;
         for(int i = 0; i<n; ++i) {
-            sum1 += (f.apply(a + (i + 1) * step) + f.apply(a + i * step))*step/2;
-        }
-        n *= 2;
-        step = (b-a)/n;
-        for(int i = 0; i<n; ++i) {
             sum2 += (f.apply(a + (i + 1) * step) + f.apply(a + i * step))*step/2;
         }
         while(Math.abs(sum2 - sum1) >= eps) {

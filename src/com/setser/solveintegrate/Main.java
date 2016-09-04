@@ -155,8 +155,10 @@ public class Main extends Application {
         int width = 1200;
         int height = 500;
         Canvas canvas = new Canvas(width, height);
-        Function<Double, Double> f = (Double x) -> { return 3*Math.sin(x) + 2*Math.log(x); };
-        Function<Double, Double> df = (Double x) -> { return 3*Math.cos(x) + 2/x; };
+        Function<Double, Double> f = (Double x) -> { return 3*x + MathUtils.integrate(
+                (Double y) -> { return 3*y + Math.pow(Math.sin(y) + 2, 4); },
+        0, x, 0.01); };
+        Function<Double, Double> df = (Double x) -> { return 3*x + Math.pow(Math.sin(x) + 2, 4) - 13; };
         VBox vBoxab = new VBox();
         HBox hBoxa = new HBox();
         Label aLabel = new Label("a:");
