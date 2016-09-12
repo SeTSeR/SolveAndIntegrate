@@ -1,5 +1,7 @@
 package com.setser.solveintegrate.utils;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
@@ -26,13 +28,17 @@ public class MathUtils {
         return sum2;
     }
 
-    public static double solve(Function<Double, Double> f, Function<Double, Double> df, double a, double b, double eps) {
-        double xprev = a, xnext = b;
+    public static ArrayList<Double> solve(Function<Double, Double> f, Function<Double, Double> df, double x0, double eps) {
+        double xprev = x0, xnext = x0 - f.apply(x0)/df.apply(x0);
+        ArrayList<Double> iterations = new ArrayList<>();
+        iterations.add(xprev);
+        iterations.add(xnext);
         while(Math.abs(xnext - xprev) >= eps) {
             xprev = xnext;
             xnext = xprev - f.apply(xprev)/df.apply(xprev);
+            iterations.add(xnext);
         }
-        return xnext;
+        return iterations;
     }
 
 }
